@@ -1,0 +1,23 @@
+
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: postgresdb-util-dev
+    environment:
+
+      POSTGRES_PASSWORD: nodejshr
+      POSTGRES_DB: mydb
+    ports:
+      - '54322:5432'
+    volumes: 
+      - db2:/var/lib/postgresql/data
+
+
+
+volumes:
+  db2:
+    driver: local
+
+
+

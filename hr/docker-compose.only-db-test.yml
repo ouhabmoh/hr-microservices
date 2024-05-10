@@ -1,0 +1,18 @@
+
+version: '3.8'
+services:
+  db-test:
+    image: postgres
+    restart: always
+    container_name: postgresdb-util-test
+    environment:
+
+      POSTGRES_PASSWORD: nodejshr
+      POSTGRES_DB: mydb
+    ports:
+      - '54323:5432'
+    volumes: 
+      - db-test2:/var/lib/postgresql/data
+volumes:
+  db-test2:
+    driver: local
