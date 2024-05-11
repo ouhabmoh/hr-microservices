@@ -63,10 +63,14 @@ const logout = async (refreshToken: string): Promise<void> => {
  */
 const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> => {
   try {
+    
+    console.log(refreshToken);
     const refreshTokenData = await tokenService.verifyToken(refreshToken, TokenType.REFRESH);
-    const { userId } = refreshTokenData;
+    console.log(refreshTokenData);
+    const user = await userService.getUserById(refreshTokenData.userId) as unknown as User;
+    console.log(user);
     await prisma.token.delete({ where: { id: refreshTokenData.id } });
-    return tokenService.generateAuthTokens({ id: userId });
+    return tokenService.generateAuthTokens(user);
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
   }

@@ -4,6 +4,7 @@ import ApiError from '../utils/ApiError';
 import { roleRights } from '../config/roles';
 import { NextFunction, Request, Response } from 'express';
 import { User } from '@prisma/client';
+import { cpSync } from 'fs';
 
 const verifyCallback =
   (
@@ -14,10 +15,11 @@ const verifyCallback =
   ) =>
   async (err: unknown, user: User | false, info: unknown) => {
     if (err || info || !user) {
+      console.log(err);
       return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
     }
     req.user = user;
-
+    console.log(req.user);
     if (requiredRights.length) {
       const userRights = roleRights.get(user.role) ?? [];
 

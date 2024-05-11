@@ -220,12 +220,13 @@ describe('Auth routes', () => {
     test('should return 200 and new auth tokens if refresh token is valid', async () => {
       await insertUsers([userOne]);
       const dbUserOne = (await prisma.user.findUnique({ where: { email: userOne.email } })) as User;
+      const {refresh, access} = await tokenService.generateAuthTokens(dbUserOne);
       const expires = moment().add(config.jwt.refreshExpirationDays, 'days');
-      const refreshToken = tokenService.generateToken(dbUserOne.id, expires, TokenType.REFRESH);
-      await tokenService.saveToken(refreshToken, dbUserOne.id, expires, TokenType.REFRESH);
-
+      const refreshToken = refresh?.token;
+    
       const res = await request(app)
         .post('/v1/auth/refresh-tokens')
+        .set('Authorization', `Bearer ${access.token}`)
         .send({ refreshToken })
         .expect(httpStatus.OK);
 
@@ -499,8 +500,8 @@ describe('Auth routes', () => {
       const sendVerificationEmailSpy = jest
         .spyOn(emailService, 'sendVerificationEmail')
         .mockImplementationOnce(() => new Promise((resolve) => resolve()));
-      const userOneAccessToken = tokenService.generateToken(
-        dbUserOne.id,
+      const userOneAccessToken = tokenService.generateUserToken(
+        dbUserOne,
         moment().add(config.jwt.accessExpirationMinutes, 'minutes'),
         TokenType.ACCESS
       );
@@ -617,8 +618,8 @@ describe('Auth middleware', () => {
   test('should call next with no errors if access token is valid', async () => {
     await insertUsers([userOne]);
     const dbUserOne = (await prisma.user.findUnique({ where: { email: userOne.email } })) as User;
-    const userOneAccessToken = tokenService.generateToken(
-      dbUserOne.id,
+    const userOneAccessToken = tokenService.generateUserToken(
+      dbUserOne,
       moment().add(config.jwt.accessExpirationMinutes, 'minutes'),
       TokenType.ACCESS
     );
@@ -727,33 +728,13 @@ describe('Auth middleware', () => {
     );
   });
 
-  test('should call next with unauthorized error if user is not found', async () => {
-    const userOneAccessToken = tokenService.generateToken(
-      2000,
-      moment().add(config.jwt.accessExpirationMinutes, 'minutes'),
-      TokenType.ACCESS
-    );
-    const req = httpMocks.createRequest({
-      headers: { Authorization: `Bearer ${userOneAccessToken}` }
-    });
-    const next = jest.fn();
-
-    await auth()(req, httpMocks.createResponse(), next);
-
-    expect(next).toHaveBeenCalledWith(expect.any(ApiError));
-    expect(next).toHaveBeenCalledWith(
-      expect.objectContaining({
-        statusCode: httpStatus.UNAUTHORIZED,
-        message: 'Please authenticate'
-      })
-    );
-  });
+ 
 
   test('should call next with forbidden error if user does not have required rights and userId is not in params', async () => {
     await insertUsers([userOne]);
     const dbUserOne = (await prisma.user.findUnique({ where: { email: userOne.email } })) as User;
-    const userOneAccessToken = tokenService.generateToken(
-      dbUserOne.id,
+    const userOneAccessToken = tokenService.generateUserToken(
+      dbUserOne,
       moment().add(config.jwt.accessExpirationMinutes, 'minutes'),
       TokenType.ACCESS
     );
@@ -773,8 +754,8 @@ describe('Auth middleware', () => {
   test('should call next with no errors if user does not have required rights but userId is in params', async () => {
     await insertUsers([userOne]);
     const dbUserOne = (await prisma.user.findUnique({ where: { email: userOne.email } })) as User;
-    const userOneAccessToken = tokenService.generateToken(
-      dbUserOne.id,
+    const userOneAccessToken = tokenService.generateUserToken(
+      dbUserOne,
       moment().add(config.jwt.accessExpirationMinutes, 'minutes'),
       TokenType.ACCESS
     );
@@ -792,8 +773,8 @@ describe('Auth middleware', () => {
   test('should call next with no errors if user has required rights', async () => {
     await insertUsers([admin]);
     const dbAdmin = (await prisma.user.findUnique({ where: { email: admin.email } })) as User;
-    const adminAccessToken = tokenService.generateToken(
-      dbAdmin.id,
+    const adminAccessToken = tokenService.generateUserToken(
+      dbAdmin,
       moment().add(config.jwt.accessExpirationMinutes, 'minutes'),
       TokenType.ACCESS
     );

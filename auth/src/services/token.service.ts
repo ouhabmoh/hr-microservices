@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 import config from '../config/config';
 import userService from './user.service';
 import ApiError from '../utils/ApiError';
-import { Token, TokenType } from '@prisma/client';
+import { Token, TokenType, User } from '@prisma/client';
 import prisma from '../client';
 import { AuthTokensResponse } from '../types/response';
 
@@ -24,6 +24,29 @@ const generateToken = (
 ): string => {
   const payload = {
     sub: userId,
+    iat: moment().unix(),
+    exp: expires.unix(),
+    type
+  };
+  return jwt.sign(payload, secret);
+};
+
+/**
+ * Generate User token
+ * @param {Omit<User, 'password'>} user
+ * @param {Moment} expires
+ * @param {string} type
+ * @param {string} [secret]
+ * @returns {string}
+ */
+const generateUserToken = (
+  user: Omit<User, 'password'>,
+  expires: Moment,
+  type: TokenType,
+  secret = config.jwt.secret
+): string => {
+  const payload = {
+    sub: user,
     iat: moment().unix(),
     exp: expires.unix(),
     type
@@ -79,12 +102,12 @@ const verifyToken = async (token: string, type: TokenType): Promise<Token> => {
 
 /**
  * Generate auth tokens
- * @param {User} user
+ * @param {Omit<User, 'password'>} user
  * @returns {Promise<AuthTokensResponse>}
  */
-const generateAuthTokens = async (user: { id: number }): Promise<AuthTokensResponse> => {
+const generateAuthTokens = async (user: Omit<User, 'password'>): Promise<AuthTokensResponse> => {
   const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
-  const accessToken = generateToken(user.id, accessTokenExpires, TokenType.ACCESS);
+  const accessToken = generateUserToken(user, accessTokenExpires, TokenType.ACCESS);
 
   const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
   const refreshToken = generateToken(user.id, refreshTokenExpires, TokenType.REFRESH);
@@ -132,6 +155,7 @@ const generateVerifyEmailToken = async (user: { id: number }): Promise<string> =
 
 export default {
   generateToken,
+  generateUserToken,
   saveToken,
   verifyToken,
   generateAuthTokens,
