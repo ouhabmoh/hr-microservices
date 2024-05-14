@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+     name: auth-deployment
+     namespace: ld-be-hr
+spec:
+     selector:
+          matchLabels:
+               app: auth
+     replicas: 1
+     minReadySeconds: 15
+     strategy:
+          type: RollingUpdate
+          rollingUpdate:
+               maxUnavailable: 1
+               maxSurge: 1
+     template:
+          metadata:
+               labels:
+                    app: auth
+          spec:
+               containers:
+                    - image: DOCKER_IMAGE
+                      imagePullPolicy: Always
+                      name: auth-pod
+                      ports:
+                           - containerPort: 3000
+                      env:
+                           - name: PORT
+                             value: "3000"
+                           - name: DATABASE_URL
+                             value: "postgresql://postgres:nodejshr@postgres-service:5432/mydb?schema=public"
+                           - name: JWT_SECRET
+                             value: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlCUEFJQkFBSkJBTzVIKytVM0xrWC91SlRvRHhWN01CUURXSTdGU0l0VXNjbGFFKzlaUUg5Q2VpOGIxcUVmCnJxR0hSVDVWUis4c3UxVWtCUVpZTER3MnN3RTVWbjg5c0ZVQ0F3RUFBUUpCQUw4ZjRBMUlDSWEvQ2ZmdWR3TGMKNzRCdCtwOXg0TEZaZXMwdHdtV3Vha3hub3NaV0w4eVpSTUJpRmI4a25VL0hwb3piTnNxMmN1ZU9wKzVWdGRXNApiTlVDSVFENm9JdWxqcHdrZTFGY1VPaldnaXRQSjNnbFBma3NHVFBhdFYwYnJJVVI5d0loQVBOanJ1enB4ckhsCkUxRmJxeGtUNFZ5bWhCOU1HazU0Wk1jWnVjSmZOcjBUQWlFQWhML3UxOVZPdlVBWVd6Wjc3Y3JxMTdWSFBTcXoKUlhsZjd2TnJpdEg1ZGdjQ0lRRHR5QmFPdUxuNDlIOFIvZ2ZEZ1V1cjg3YWl5UHZ1YStxeEpXMzQrb0tFNXdJZwpQbG1KYXZsbW9jUG4rTkVRdGhLcTZuZFVYRGpXTTlTbktQQTVlUDZSUEs0PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQ=="
+                           - name: JWT_ACCESS_EXPIRATION_MINUTES
+                             value: "3000"
+                           - name: JWT_REFRESH_EXPIRATION_DAYS
+                             value: "30"
+                           - name: JWT_RESET_PASSWORD_EXPIRATION_MINUTES
+                             value: "10"
+                           - name: JWT_VERIFY_EMAIL_EXPIRATION_MINUTES
+                             value: "10"
+                           - name: SMTP_HOST
+                             value: "email-server"
+                           - name: SMTP_PORT
+                             value: "587"
+                           - name: SMTP_USERNAME
+                             value: "email-server-username"
+                           - name: SMTP_PASSWORD
+                             value: "email-server-password"
+                           - name: EMAIL_FROM
+                             value: "support@yourapp.com"
+                      resources:
+                           requests:
+                                memory: "256Mi"
+                                cpu: "0.5"
+                           limits:
+                                memory: "512Mi"
+                                cpu: "1"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+     name: auth-service
+     namespace: ld-be-hr
+spec:
+     ports:
+          - port: 3000
+            targetPort: 3000
+     selector:
+          app: auth
