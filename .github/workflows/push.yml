@@ -13,6 +13,8 @@ on:
           branches: [dev]
 env:
      ECR_REPOSITORY: hr-ld-academy-cluster-repository
+     EKS_CLUSTER_NAME: hr-ld-academy-cluster
+     AWS_REGION: ${{ secrets.AWS_REGION }}
 
 jobs:
      build:
