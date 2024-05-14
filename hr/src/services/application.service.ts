@@ -62,7 +62,7 @@ const queryApplications = async <Key extends keyof Application>(
   if (jobId) {
     filter = {
       ...filter,
-      jobId
+    jobId
     };
   }
   const applications = await prisma.application.findMany({

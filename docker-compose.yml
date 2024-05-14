@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  hr-app:
+    build: ./hr
+    env_file: ./hr/prod.env
+    image: hr-app
+    command: yarn db:push && yarn start
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgresdb
+    volumes:
+      - ./hr:/usr/src/hr-app
+    networks:
+      - node-network
+
+  auth-app:
+    build: ./auth
+    env_file: ./auth/prod.env
+    image: auth-app
+    command: yarn db:push && yarn start
+    ports:
+      - '3001:3000'
+    depends_on:
+      - postgresdb
+    volumes:
+      - ./auth:/usr/src/auth-app
+    networks:
+      - node-network
+
+  postgresdb:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=nodejshr
+      - POSTGRES_DB=mydb
+    ports:
+      - '54322:5432'
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - node-network
+
+volumes:
+  dbdata:
+    driver: local
+
+networks:
+  node-network:
+    driver: bridge

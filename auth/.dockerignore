@@ -2,3 +2,27 @@ node_modules
 .git
 .gitignore
 .DS_Store
+tests
+
+.husky
+# Ignore .env file
+.env
+
+# Ignore logs
+*.log
+
+# Ignore the npm debug log file
+npm-debug.log
+
+# Ignore the dist directory
+dist
+
+# Ignore IDE specific files
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+*.swn
+*.bak
+*.orig

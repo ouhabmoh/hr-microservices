@@ -14,18 +14,9 @@ const jwtVerify: VerifyCallback = async (payload, done) => {
       throw new Error('Invalid token type');
     }
 
-    const user = await prisma.user.findUnique({
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        role: true,
-        deletedAt: true
-      },
-      where: { id: payload.sub }
-    });
+    const user = payload.sub;
 
-    if (!user || user.deletedAt !== null) {
+    if (!user || (user.deletedAt && user.deletedAt !== null)) {
       return done(null, false);
     }
     done(null, user);

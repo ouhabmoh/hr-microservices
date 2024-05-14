@@ -20,7 +20,7 @@ const applyJob = catchAsync(async (req, res) => {
 const getApplications = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['status']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await applicationService.queryApplications(req.params.jobId, filter, options);
+  const result = await applicationService.queryApplications(parseInt(req.params.jobId), filter, options);
   res.send(result);
 });
 
