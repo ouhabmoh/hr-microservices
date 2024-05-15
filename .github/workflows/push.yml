@@ -15,6 +15,7 @@ env:
      ECR_REPOSITORY: hr-ld-academy-cluster-repository
      EKS_CLUSTER_NAME: learnk8s
      AWS_REGION: ${{ secrets.AWS_REGION }}
+     PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
 
 jobs:
      build:
@@ -43,6 +44,7 @@ jobs:
                  env:
                       ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
                       ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+                      PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
 
                  run: |
                       # Build a docker container and push it to ECR
