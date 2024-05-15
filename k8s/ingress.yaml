@@ -1,11 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-     name: hr-ingress
+     name: hello-kubernetes
+     annotations:
+          alb.ingress.kubernetes.io/scheme: internet-facing
+          kubernetes.io/ingress.class: alb
 spec:
      rules:
-          - host: hr.local
-            http:
+          - http:
                  paths:
                       - path: /auth
                         pathType: Prefix
@@ -13,5 +15,4 @@ spec:
                              service:
                                   name: auth-service
                                   port:
-                                       number: 3000
-     ingressClassName: nginx
+                                       number: 80

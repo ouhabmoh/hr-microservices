@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
      name: auth-deployment
-     namespace: ld-be-hr
+
 spec:
      selector:
           matchLabels:
@@ -22,7 +22,7 @@ spec:
                containers:
                     - image: DOCKER_IMAGE
                       imagePullPolicy: Always
-                      command: ["yarn db:push && yarn start"]
+                      command: ["yarn start"]
                       name: auth-pod
                       ports:
                            - containerPort: 3000
@@ -64,10 +64,10 @@ apiVersion: v1
 kind: Service
 metadata:
      name: auth-service
-     namespace: ld-be-hr
+
 spec:
      ports:
-          - port: 3000
+          - port: 80
             targetPort: 3000
      selector:
           app: auth
