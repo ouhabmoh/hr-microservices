@@ -84,7 +84,7 @@ jobs:
                       IMAGE: ${{ steps.push-image.outputs.image }}
                  run: |
                       sed -i.bak "s|DOCKER_IMAGE|$IMAGE|g" k8s/auth-deployment.yaml && \
-                        kubectl apply -f k8s/hr-namespace.yaml
+
                         kubectl apply -f k8s/postgres-deployment.yaml
                         kubectl apply -f k8s/auth-deployment.yaml
                         kubectl apply -f k8s/ingress.yaml
