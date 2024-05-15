@@ -5,12 +5,11 @@ RUN mkdir -p /usr/src/node-app && chown -R node:node /usr/src/node-app
 WORKDIR /usr/src/node-app
 
 COPY package.json yarn.lock ./
-
+COPY ./prisma prisma
+RUN yarn run db:generate
 USER node
 
 RUN yarn install --pure-lockfile
-
-COPY prisma/client ./node_modules/.prisma/client
 
 COPY --chown=node:node . .
 
