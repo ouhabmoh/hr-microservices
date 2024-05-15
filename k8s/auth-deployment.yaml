@@ -57,7 +57,7 @@ spec:
                            - name: EMAIL_FROM
                              value: "suppodrt@yourapp.com"
                            - name: PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING
-                             value: true
+                             value: "true"
                       resources:
                            requests:
                                 memory: "256Mi"
