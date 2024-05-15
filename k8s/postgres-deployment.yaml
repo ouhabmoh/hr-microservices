@@ -41,8 +41,7 @@ spec:
                              value: nodejshr
                            - name: POSTGRES_DB
                              value: mydb
-                           - name: PGDATA
-                             value: /var/lib/postgresql/data/pgdata
+
                       volumeMounts:
                            - name: data
                              mountPath: /var/lib/postgresql/data
