@@ -26,7 +26,7 @@ spec:
                            - /bin/sh
                            - -c
                            - |
-                                yarn db:push
+
                                 yarn start
                       name: auth-pod
                       ports:
