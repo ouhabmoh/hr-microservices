@@ -72,6 +72,8 @@ metadata:
 spec:
      accessModes:
           - ReadWriteOnce
+     hostPath:
+          path: "/mnt/data"
      resources:
           requests:
                storage: 256Mi
