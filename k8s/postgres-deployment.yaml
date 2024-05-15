@@ -11,35 +11,28 @@ parameters:
      encrypted: "true"
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-     name: postgres-deployment
-
+     name: postgres
 spec:
+     serviceName: postgres
+     replicas: 1
      selector:
           matchLabels:
-               app: postgres-app
-     replicas: 1
-     minReadySeconds: 15
-     strategy:
-          type: RollingUpdate
-          rollingUpdate:
-               maxUnavailable: 1
-               maxSurge: 1
+               app: postgres
      template:
           metadata:
                labels:
-                    app: postgres-app
+                    app: postgres
           spec:
                containers:
-                    - image: postgres
-                      imagePullPolicy: Always
-                      name: postgres-pod
+                    - name: postgres
+                      image: postgres
                       ports:
                            - containerPort: 5432
                       env:
                            - name: POSTGRES_HOST
-                             value: postgres-service
+                             value: postgres
                            - name: POSTGRES_PORT
                              value: "5432"
                            - name: POSTGRES_USER
@@ -49,31 +42,27 @@ spec:
                            - name: POSTGRES_DB
                              value: mydb
                       volumeMounts:
-                           - name: postgres-data
+                           - name: data
                              mountPath: /var/lib/postgresql/data
-                      resources:
-                           requests:
-                                memory: "256Mi"
-                                cpu: "0.5"
-                           limits:
-                                memory: "512Mi"
-                                cpu: "1"
-               volumes:
-                    - name: postgres-data
-                      persistentVolumeClaim:
-                           claimName: postgres-pvc
+     volumeClaimTemplates:
+          - metadata:
+                 name: data
+            spec:
+                 accessModes: ["ReadWriteOnce"]
+                 resources:
+                      requests:
+                           storage: 256Mi
+                 storageClassName: postgres-storage
 ---
 apiVersion: v1
 kind: Service
 metadata:
-     name: postgres-service
-
+     name: postgres
 spec:
      ports:
           - port: 5432
-            targetPort: 5432
      selector:
-          app: postgres-app
+          app: postgres
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
