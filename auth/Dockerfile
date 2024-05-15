@@ -6,9 +6,9 @@ WORKDIR /usr/src/node-app
 
 COPY package.json yarn.lock ./
 COPY ./prisma prisma
-RUN yarn run db:generate
-USER node
 
+USER node
+RUN npx prisma generate
 RUN yarn install --pure-lockfile
 
 COPY --chown=node:node . .
