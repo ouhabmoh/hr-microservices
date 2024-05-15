@@ -10,7 +10,7 @@ USER node
 
 RUN yarn install --pure-lockfile
 
-COPY node_modules/prisma/client ./
+COPY prisma/client ./node_modules/prisma/client
 
 COPY --chown=node:node . .
 
