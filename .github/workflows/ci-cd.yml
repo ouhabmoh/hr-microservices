@@ -26,6 +26,18 @@ jobs:
                - name: Checkout
                  uses: actions/checkout@v2
 
+               - name: Set Node.js
+                 uses: actions/setup-node@v3
+                 with:
+                      node-version: 18.x
+
+               - name: Install dependencies and run tests
+                 run: |
+                      cd ./auth
+                      mv test.env .env
+                      yarn install --pure-lockfile
+                      yarn test
+
                - name: Configure AWS credentials
                  uses: aws-actions/configure-aws-credentials@v1
                  with:

@@ -5,11 +5,11 @@ services:
     build: ./hr
     env_file: ./hr/prod.env
     image: hr-app
-    command: yarn db:push && yarn start
+    command: yarn start
     ports:
       - '3000:3000'
     depends_on:
-      - postgresdb
+      - postgresdb2
     volumes:
       - ./hr:/usr/src/hr-app
     networks:
@@ -19,17 +19,17 @@ services:
     build: ./auth
     env_file: ./auth/prod.env
     image: auth-app
-    command: yarn db:push && yarn start
+    command: yarn start
     ports:
       - '3001:3000'
     depends_on:
-      - postgresdb
+      - postgresdb2
     volumes:
       - ./auth:/usr/src/auth-app
     networks:
       - node-network
 
-  postgresdb:
+  postgresdb2:
     image: postgres
     restart: always
     environment:
@@ -37,14 +37,14 @@ services:
       - POSTGRES_PASSWORD=nodejshr
       - POSTGRES_DB=mydb
     ports:
-      - '54322:5432'
+      - '54323:5432'
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - dbdata2:/var/lib/postgresql/data
     networks:
       - node-network
 
 volumes:
-  dbdata:
+  dbdata2:
     driver: local
 
 networks:

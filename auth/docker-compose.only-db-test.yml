@@ -5,8 +5,10 @@ services:
     image: postgres
     restart: always
     container_name: postgresdb-util-test
-    env_file:
-      - ./test.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=nodejshr
+      - POSTGRES_DB=test_db
 
     ports:
       - '54323:5432'

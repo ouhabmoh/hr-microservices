@@ -13,9 +13,9 @@ const jwtVerify: VerifyCallback = async (payload, done) => {
     if (payload.type !== TokenType.ACCESS) {
       throw new Error('Invalid token type');
     }
-    console.log("middleware", payload);
+
     const user = payload.sub;
-    console.log("middleware", user);
+  
     if (!user || (user.deletedAt && user.deletedAt !== null)) {
       return done(null, false);
     }

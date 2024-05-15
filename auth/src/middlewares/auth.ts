@@ -15,11 +15,11 @@ const verifyCallback =
   ) =>
   async (err: unknown, user: User | false, info: unknown) => {
     if (err || info || !user) {
-      console.log(err);
+     
       return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
     }
     req.user = user;
-    console.log(req.user);
+  
     if (requiredRights.length) {
       const userRights = roleRights.get(user.role) ?? [];
 
