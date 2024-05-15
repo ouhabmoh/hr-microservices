@@ -10,6 +10,8 @@ USER node
 
 RUN yarn install --pure-lockfile
 
+COPY node_modules/prisma/client ./
+
 COPY --chown=node:node . .
 
 EXPOSE 3000
