@@ -1,80 +1,96 @@
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-     name: postgres-storage
 
-provisioner: kubernetes.io/aws-ebs
-parameters:
-     type: gp2
-     fsType: ext4
-     encrypted: "true"
+
 ---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-     name: postgres
+  name: postgres
 spec:
-     serviceName: postgres
-     replicas: 1
-     selector:
-          matchLabels:
-               app: postgres
-     template:
-          metadata:
-               labels:
-                    app: postgres
-          spec:
-               containers:
-                    - name: postgres
-                      image: postgres
-                      ports:
-                           - containerPort: 5432
-                      env:
-                           - name: POSTGRES_HOST
-                             value: postgres
-                           - name: POSTGRES_PORT
-                             value: "5432"
-                           - name: POSTGRES_USER
-                             value: postgres
-                           - name: POSTGRES_PASSWORD
-                             value: nodejshr
-                           - name: POSTGRES_DB
-                             value: mydb
-                      volumeMounts:
-                           - name: data
-                             mountPath: /var/lib/postgresql/data
-     volumeClaimTemplates:
-          - metadata:
-                 name: data
-            spec:
-                 accessModes: ["ReadWriteOnce"]
-                 resources:
-                      requests:
-                           storage: 256Mi
-                 storageClassName: postgres-storage
+  replicas: 1
+  serviceName: postgres
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: postgres
+          image: postgres:13
+          imagePullPolicy: "IfNotPresent"
+          ports:
+               - containerPort: 5432
+          env:
+               - name: POSTGRES_HOST
+               value: postgres
+               - name: POSTGRES_PORT
+               value: "5432"
+               - name: POSTGRES_USER
+               value: postgres
+               - name: POSTGRES_PASSWORD
+               value: nodejshr
+               - name: POSTGRES_DB
+               value: mydb
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+           
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+      
 ---
 apiVersion: v1
 kind: Service
 metadata:
-     name: postgres
+  name: postgres
+  labels:
+    app: postgres
 spec:
-     ports:
-          - port: 5432
-     selector:
-          app: postgres
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-     name: postgres-pvc
-
-spec:
-     accessModes:
-          - ReadWriteOnce
-     hostPath:
-          path: "/mnt/data"
-     resources:
-          requests:
-               storage: 256Mi
-     storageClassName: postgres-storage
+  type: ClusterIP
+  ports:
+   - port: 5432
+  selector:
+   app: postgres
