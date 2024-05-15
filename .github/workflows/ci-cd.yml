@@ -16,7 +16,7 @@ env:
      EKS_CLUSTER_NAME: learnk8s
      AWS_REGION: ${{ secrets.AWS_REGION }}
      PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
-     DATABASE_URL: postgres://postgres:postgres@potgres:5432/postgres
+     DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
 
 jobs:
      build:
