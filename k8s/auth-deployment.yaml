@@ -50,7 +50,7 @@ spec:
                            - name: SMTP_PASSWORD
                              value: "email-server-password"
                            - name: EMAIL_FROM
-                             value: "support@yourapp.com"
+                             value: "suppodrt@yourapp.com"
                       resources:
                            requests:
                                 memory: "256Mi"
