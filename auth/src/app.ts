@@ -50,7 +50,7 @@ if (config.env === 'production') {
 
 // Health check route
 app.get('/health', (req, res) => {
-  res.status(httpStatus.OK).send('Server is healthy');
+  res.status(httpStatus.OK).send('Server is healthy and updated');
 });
 
 // v1 api routes
