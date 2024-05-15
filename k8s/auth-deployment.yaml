@@ -22,7 +22,12 @@ spec:
                containers:
                     - image: DOCKER_IMAGE
                       imagePullPolicy: Always
-                      command: ["yarn", "start"]
+                      command:
+                           - /bin/sh
+                           - -c
+                           - |
+                                yarn db:push
+                                yarn start
                       name: auth-pod
                       ports:
                            - containerPort: 3000
