@@ -8,7 +8,7 @@ COPY package.json yarn.lock ./
 COPY ./prisma prisma
 
 USER node
-
+ARG PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 RUN yarn install --pure-lockfile
 RUN npx prisma generate
 COPY --chown=node:node . .
