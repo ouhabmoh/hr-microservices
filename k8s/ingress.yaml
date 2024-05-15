@@ -14,5 +14,3 @@ spec:
                         backend:
                              service:
                                   name: auth-service
-                                  port:
-                                       number: 3000
